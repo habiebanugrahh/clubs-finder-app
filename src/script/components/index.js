@@ -9,3 +9,5 @@ import './section-with-title.js';
 
 import './query-waiting.js';
 import './search-loading.js';
+
+import './club-search-error.js';

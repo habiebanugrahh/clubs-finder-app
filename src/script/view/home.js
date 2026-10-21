@@ -1,5 +1,5 @@
 import Utils from '../utils.js';
-import Clubs from '../data/local/clubs.js';
+import SportsApi from '../data/remote/sports-api.js';
 
 const home = () => {
   const searchFormElement = document.querySelector('search-bar');
@@ -7,21 +7,30 @@ const home = () => {
   const clubListContainerElement = document.querySelector('#clubListContainer');
   const clubQueryWaitingElement = document.querySelector('query-waiting');
   const clubLoadingElement = document.querySelector('search-loading');
+  const clubSearchErrorElement = clubListContainerElement.querySelector('club-search-error');
   const clubListElement = clubListContainerElement.querySelector('club-list');
 
   const showSportClub = (query) => {
     showLoading();
 
-    const result = Clubs.searchClub(query);
-    displayResult(result);
+    SportsApi.searchClub(query)
+      .then((result) => {
+        displayResult(result);
 
-    showClubList();
+        showClubList();
+      })
+      .catch((error) => {
+        clubSearchErrorElement.textContent = error.message;
+        showSearchError();
+      });
   };
 
   const onSearchHandler = (event) => {
     event.preventDefault();
 
-    const { query } = event.detail;
+    const {
+      query
+    } = event.detail;
     showSportClub(query);
   };
 
@@ -56,6 +65,13 @@ const home = () => {
       Utils.hideElement(element);
     });
     Utils.showElement(clubQueryWaitingElement);
+  };
+
+  const showSearchError = () => {
+    Array.from(clubListContainerElement.children).forEach((element) => {
+      Utils.hideElement(element);
+    });
+    Utils.showElement(clubSearchErrorElement);
   };
 
   searchFormElement.addEventListener('search', onSearchHandler);
